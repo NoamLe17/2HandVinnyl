@@ -219,3 +219,31 @@
   color: var(--text-muted);
   font-size: 1.1rem;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.1rem;
+    padding: 0 16px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    padding: 0 16px;
+  }
+  
+  .btnLarge {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .glow1, .glow2 {
+    width: 100vw;
+    height: 100vw;
+    filter: blur(40px);
+  }
+}

@@ -284,3 +284,39 @@
   border-top: 1px solid var(--border);
   color: var(--text-secondary);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .chatContainer {
+    height: 500px;
+  }
+  
+  .inputWrapper {
+    flex-direction: column;
+  }
+  
+  .chatSubmit {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .guidesGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filterControls {
+    flex-direction: column;
+  }
+  
+  .filterSelect {
+    width: 100%;
+  }
+  
+  .scaleContainer {
+    padding: 20px;
+  }
+}

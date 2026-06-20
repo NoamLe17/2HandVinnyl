@@ -69,3 +69,33 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .headerContent {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 16px 0;
+  }
+  
+  .logo {
+    font-size: 1.25rem;
+  }
+  
+  .nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 16px;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .navLink span {
+    display: none; /* Hide text on mobile, just show icons */
+  }
+  
+  .actions {
+    order: 2;
+  }
+}
