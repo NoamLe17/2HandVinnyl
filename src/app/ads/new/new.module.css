@@ -1,0 +1,186 @@
+.container {
+  padding-top: 32px;
+  padding-bottom: 64px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+}
+
+.formLayout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.mainForm {
+  flex: 1;
+  padding: 32px;
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+}
+
+.itemsTitle {
+  font-size: 1.5rem;
+  margin: 32px 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.itemCard {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.removeBtn:hover {
+  opacity: 0.8;
+}
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px 24px;
+}
+
+.checkboxGroup {
+  margin: 16px 0 24px 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.imageUpload {
+  margin-top: 24px;
+}
+
+.uploadBox {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.uploadBox:hover {
+  border-color: var(--primary);
+  background: rgba(157, 78, 221, 0.05);
+}
+
+.uploadHint {
+  font-size: 0.85rem;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+}
+
+.summaryPanel {
+  width: 350px;
+  padding: 32px;
+  position: sticky;
+  top: 100px;
+}
+
+.summaryPanel h2 {
+  font-size: 1.25rem;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+}
+
+.summaryItem strong {
+  color: var(--text-main);
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: 32px;
+  padding: 16px;
+  font-size: 1.1rem;
+}
+
+.termsText {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .formLayout {
+    flex-direction: column-reverse;
+  }
+  
+  .summaryPanel {
+    width: 100%;
+    position: static;
+  }
+  
+  .itemGrid {
+    grid-template-columns: 1fr;
+  }
+}

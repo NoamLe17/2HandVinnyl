@@ -1,0 +1,50 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isMaster() {
+      return request.auth != null && request.auth.token.email == "noamhemo2001@gmail.com";
+    }
+
+    // Rules for ads
+    match /ads/{adId} {
+      allow read: if true;
+      // Allow create if authenticated OR if it's a guest ad (sellerId == "guest")
+      allow create: if (request.auth != null && request.resource.data.sellerId == request.auth.uid)
+                    || request.resource.data.sellerId == "guest";
+      allow update, delete: if isMaster() || (request.auth != null && resource.data.sellerId == request.auth.uid);
+
+      // Events subcollection – anyone can write (for tracking), only owner/master can read
+      match /events/{eventId} {
+        allow read: if isMaster() || (request.auth != null && get(/databases/$(database)/documents/ads/$(adId)).data.sellerId == request.auth.uid);
+        allow create: if true; // anonymous tracking allowed
+      }
+
+      // Items subcollection
+      match /items/{itemId} {
+        allow read: if true;
+        allow write: if isMaster() || request.auth != null;
+      }
+    }
+
+    // Messages (contact form)
+    match /messages/{msgId} {
+      allow read: if isMaster();
+      allow create: if true;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isMaster() || (request.auth != null && request.auth.uid == userId);
+    }
+
+    // Forum messages
+    match /forum_messages/{msgId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isMaster();
+    }
+  }
+}
