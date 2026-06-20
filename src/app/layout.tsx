@@ -10,8 +10,22 @@ import Footer from "@/components/Footer";
 const heebo = Heebo({ subsets: ["hebrew", "latin"] });
 
 export const metadata: Metadata = {
-  title: "צליל חוזר - הבית של חובבי המוזיקה",
-  description: "הפלטפורמה המובילה לקנייה ומכירה של תקליטים וציוד פטיפונים יד שנייה.",
+  title: "צליל חוזר - קהילת התקליטים של ישראל",
+  description: "הפלטפורמה המובילה לקנייה ומכירה של תקליטים וציוד פטיפונים יד שנייה. הצטרפו לקהילת האודיופילים הגדולה בישראל.",
+  keywords: ["תקליטים", "פטיפונים", "יד שנייה", "ויניל", "מוזיקה", "קהילת מוזיקה", "audio", "vinyl"],
+  openGraph: {
+    title: "צליל חוזר - קהילת התקליטים של ישראל",
+    description: "הפלטפורמה המובילה לקנייה ומכירה של תקליטים וציוד פטיפונים יד שנייה.",
+    url: "https://tzlil-chozer.vercel.app", // User can change this to custom domain later
+    siteName: "צליל חוזר",
+    locale: "he_IL",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "צליל חוזר - קהילת התקליטים של ישראל",
+    description: "בואו לקחת חלק בקהילת התקליטים והפטיפונים של ישראל.",
+  },
 };
 
 export default function RootLayout({
