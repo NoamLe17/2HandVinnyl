@@ -29,7 +29,7 @@ service cloud.firestore {
     }
 
     // Messages (contact form)
-    match /messages/{msgId} {
+    match /contact_messages/{msgId} {
       allow read: if isMaster();
       allow create: if true;
     }
