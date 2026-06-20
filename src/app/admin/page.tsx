@@ -46,7 +46,7 @@ export default function AdminDashboard() {
       // Fetch Ads
       const qAds = query(collection(db, "ads"), orderBy("createdAt", "desc"));
       const snapshotAds = await getDocs(qAds);
-      const adsData = snapshotAds.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const adsData = snapshotAds.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
       setAds(adsData);
       
       // Calculate sellers
