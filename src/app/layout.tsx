@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "צליל חוזר - קהילת התקליטים של ישראל",
     description: "הפלטפורמה המובילה לקנייה ומכירה של תקליטים וציוד פטיפונים יד שנייה.",
-    url: "https://tzlil-chozer.vercel.app", // User can change this to custom domain later
+    url: "https://tzlilchozer.com",
     siteName: "צליל חוזר",
     locale: "he_IL",
     type: "website",
