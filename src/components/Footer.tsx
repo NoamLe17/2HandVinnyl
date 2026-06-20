@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Disc, Mail, MessageCircle, FileText, Shield, X, Send } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { sendContactEmail } from "@/app/actions/sendEmail";
 
 export default function Footer() {
   const [showContact, setShowContact] = useState(false);
@@ -27,10 +28,11 @@ export default function Footer() {
         status: "new"
       });
 
-      // Trigger Mailto for admin
-      const subject = encodeURIComponent(`פנייה חדשה מצליל חוזר: ${formData.name}`);
-      const body = encodeURIComponent(`שם: ${formData.name}\nאימייל: ${formData.email}\n\nהודעה:\n${formData.message}`);
-      window.location.href = `mailto:noamhemo2001@gmail.com?subject=${subject}&body=${body}`;
+      // Send email via Resend Server Action
+      const emailRes = await sendContactEmail(formData.name, formData.email, formData.message);
+      if (!emailRes.success) {
+        console.error("Failed to send email via Resend");
+      }
 
       setSubmitSuccess(true);
       setTimeout(() => {

@@ -7,6 +7,7 @@ import { db, auth, storage } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
+import { sendNewAdEmail } from "@/app/actions/sendEmail";
 import { onAuthStateChanged, User } from "firebase/auth";
 import Link from "next/link";
 import { useLoadScript, Libraries, Autocomplete } from "@react-google-maps/api";
@@ -156,6 +157,12 @@ export default function CreateAdPage() {
           const { updateDoc, doc } = await import("firebase/firestore");
           await updateDoc(doc(db, "ads", docRef.id), { images: uploadedUrls });
         }
+      }
+
+      // Send email notification to admin about the new ad (using the first item details)
+      if (items.length > 0) {
+        const sellerNameStr = isGuest ? guestName : ((user as User).displayName || (user as User).email?.split("@")[0] || "מוכר");
+        await sendNewAdEmail(items[0].title, items[0].price, sellerNameStr);
       }
 
       router.push("/store");
