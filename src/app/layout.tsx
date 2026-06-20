@@ -6,6 +6,7 @@ import { Disc, Map, ShoppingBag, Info, Users } from "lucide-react";
 import styles from "./layout.module.css";
 import AuthButtons from "@/components/AuthButtons";
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"] });
 
@@ -47,24 +48,7 @@ export default function RootLayout({
                 בואו לקחת חלק בקהילה
               </div>
             </Link>
-            <nav className={styles.nav}>
-              <Link href="/store" className={styles.navLink}>
-                <ShoppingBag size={20} />
-                <span>חנות</span>
-              </Link>
-              <Link href="/map" className={styles.navLink}>
-                <Map size={20} />
-                <span>מפה</span>
-              </Link>
-              <Link href="/community" className={styles.navLink}>
-                <Users size={20} />
-                <span>קהילה</span>
-              </Link>
-              <Link href="/about" className={styles.navLink}>
-                <Info size={20} />
-                <span>אודות</span>
-              </Link>
-            </nav>
+            <Navigation />
             <div className={styles.actions}>
               <AuthButtons />
             </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import styles from "./map.module.css";
 import dynamic from "next/dynamic";
 import { Filter } from "lucide-react";
@@ -10,15 +11,23 @@ const MapComponent = dynamic(() => import("@/components/MapComponent"), {
 });
 
 export default function MapPage() {
+  const [showFilters, setShowFilters] = useState(false);
+
   return (
     <div className={styles.container}>
       {/* Horizontal Filter Bar */}
       <div className={styles.topBar}>
-        <div className={styles.topBarContent}>
+        <div className={styles.mobileToggle} onClick={() => setShowFilters(!showFilters)}>
           <div className={styles.filterTitle}>
             <Filter size={20} color="var(--primary)" />
-            <span>סינון תוצאות:</span>
+            <span>סינון תוצאות במפה</span>
           </div>
+          <div className={styles.toggleBtn}>
+            {showFilters ? 'הסתר ▲' : 'הצג סננים ▼'}
+          </div>
+        </div>
+
+        <div className={`${styles.topBarContent} ${showFilters ? styles.showFilters : ''}`}>
 
           <div className={styles.filterGroup}>
             <select>

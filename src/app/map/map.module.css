@@ -112,10 +112,43 @@
   border-radius: 0 !important;
 }
 
+.mobileToggle {
+  display: none;
+}
+
+.toggleBtn {
+  font-size: 0.9rem;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 12px;
+  background: rgba(123, 44, 191, 0.1);
+  border-radius: 100px;
+}
+
 @media (max-width: 900px) {
+  .topBar {
+    padding: 12px;
+  }
+
+  .mobileToggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+  }
+
   .topBarContent {
+    display: none;
     flex-direction: column;
     align-items: stretch;
+    margin-top: 16px;
+    gap: 12px;
+  }
+  
+  .showFilters {
+    display: flex !important;
   }
   
   .filterBtn {
@@ -125,5 +158,14 @@
   
   .priceRange input {
     width: 100%;
+  }
+
+  .filterTitle {
+    display: none; /* Hide the duplicate title inside content on mobile */
+  }
+
+  .mobileToggle .filterTitle {
+    display: flex; /* Keep the one in the toggle header */
+    margin-left: 0;
   }
 }

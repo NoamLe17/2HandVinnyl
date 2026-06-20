@@ -54,8 +54,14 @@
   transition: transform 0.3s ease;
 }
 
-.navLink:hover::after {
+.navLink:hover::after,
+.activeLink::after {
   transform: scaleX(1);
+}
+
+.activeLink {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .actions {
