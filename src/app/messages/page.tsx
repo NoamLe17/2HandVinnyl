@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./messages.module.css";
 import { Send, ArrowRight, MessageSquare } from "lucide-react";
@@ -9,7 +9,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialChatId = searchParams.get("chatId");
@@ -193,5 +193,13 @@ export default function MessagesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center' }}>טוען...</div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }
