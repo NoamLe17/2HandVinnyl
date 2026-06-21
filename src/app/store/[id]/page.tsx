@@ -134,12 +134,23 @@ export default function AdDetailsPage() {
           <div className={`glass-panel ${styles.detailsPanel}`}>
             <div className={styles.header}>
               <div className={styles.titleArea}>
-                <div className={styles.badge}>{adDetails.type}</div>
+                <div className={styles.badge}>{adDetails.dealType === "exchange" ? "החלפה" : adDetails.dealType === "wanted" ? "חיפוש קנייה" : adDetails.type}</div>
                 <h1 className={styles.title}>{adDetails.title}</h1>
               </div>
               <div className={styles.priceArea}>
-                <span className={styles.price}>₪{adDetails.price}</span>
-                {adDetails.isNegotiable && <span className={styles.negotiable}>גמיש במחיר</span>}
+                {adDetails.dealType === "wanted" ? (
+                  <>
+                    <span className={styles.price} style={{ color: "#F72585" }}>🔎 תקציב: ₪{adDetails.price}</span>
+                    {adDetails.isNegotiable && <span className={styles.negotiable}>גמיש בתקציב</span>}
+                  </>
+                ) : adDetails.dealType === "exchange" ? (
+                  <span className={styles.price} style={{ color: "#4CC9F0" }}>🤝 להחלפה</span>
+                ) : (
+                  <>
+                    <span className={styles.price}>₪{adDetails.price}</span>
+                    {adDetails.isNegotiable && <span className={styles.negotiable}>גמיש במחיר</span>}
+                  </>
+                )}
               </div>
             </div>
 
@@ -167,6 +178,27 @@ export default function AdDetailsPage() {
               )}
             </div>
 
+            {adDetails.dealType === "exchange" && (
+              <div style={{ background: "rgba(76, 201, 240, 0.1)", border: "1px solid rgba(76, 201, 240, 0.3)", borderRadius: "12px", padding: "16px", marginBottom: "24px" }}>
+                <h3 style={{ margin: "0 0 8px", color: "#0096c7", display: "flex", alignItems: "center", gap: "8px", fontSize: "1.1rem" }}>
+                  <span>🤝</span> פרטי החלפה
+                </h3>
+                <p style={{ margin: "0 0 8px", fontWeight: 600 }}>מעוניין לקבל תמורתו:</p>
+                <p style={{ margin: "0 0 12px" }}>{adDetails.exchangeFor}</p>
+                
+                {adDetails.exchangeCashRole === "receive" && (
+                  <p style={{ margin: 0, fontSize: "0.95rem" }}>
+                    <strong>דרישת תשלום בנוסף:</strong> ₪{adDetails.price}
+                  </p>
+                )}
+                {adDetails.exchangeCashRole === "add" && (
+                  <p style={{ margin: 0, fontSize: "0.95rem" }}>
+                    <strong>מוכן להוסיף כסף:</strong> ₪{adDetails.price}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className={styles.description}>
               <h3>תיאור הפריט</h3>
               <p>{adDetails.description || "לא סופק תיאור על ידי המוכר."}</p>
@@ -176,7 +208,7 @@ export default function AdDetailsPage() {
 
         <div className={styles.sideCol}>
           <div className={`glass-panel ${styles.sellerCard}`}>
-            <h3>פרטי המוכר</h3>
+            <h3>{adDetails.dealType === "wanted" ? "פרטי המחפש" : "פרטי המוכר"}</h3>
             <div className={styles.sellerInfo}>
               <div className={styles.sellerAvatar}>{adDetails.sellerName?.charAt(0) || "מ"}</div>
               <div>
@@ -191,7 +223,7 @@ export default function AdDetailsPage() {
 
             <div className={styles.actions}>
               <Link href="/messages" className={`btn-primary ${styles.actionBtn}`}>
-                <MessageCircle size={20} /> שלח הודעה למוכר
+                <MessageCircle size={20} /> {adDetails.dealType === "wanted" ? "יש לי את הפריט! שלח הודעה" : "שלח הודעה למוכר"}
               </Link>
               <div className={styles.secondaryActions}>
                 <button className={`btn-secondary ${styles.iconBtn}`}><Heart size={20} /></button>
@@ -201,7 +233,7 @@ export default function AdDetailsPage() {
             
             <div className={styles.safetyTip}>
               <strong>טיפ בטיחות:</strong>
-              <p>לעולם אל תעבירו כסף מראש ללא קבלת המוצר או שימוש בשירות משלוחים מאובטח.</p>
+              <p>{adDetails.dealType === "wanted" ? "ודאו שהמוכר שולח לכם תמונות עדכניות של הפריט שברשותו לפני העברת תשלום." : "לעולם אל תעבירו כסף מראש ללא קבלת המוצר או שימוש בשירות משלוחים מאובטח."}</p>
             </div>
           </div>
         </div>

@@ -40,9 +40,9 @@ export default function Footer() {
         setShowContact(false);
         setFormData({ name: "", email: "", message: "" });
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
-      alert("אירעה שגיאה בשליחת ההודעה, אנא נסה שוב.");
+      alert("אירעה שגיאה בשליחת ההודעה: " + (error.message || "שגיאה לא ידועה"));
     } finally {
       setIsSubmitting(false);
     }

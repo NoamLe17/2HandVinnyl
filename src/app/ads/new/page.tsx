@@ -24,7 +24,7 @@ export default function CreateAdPage() {
   });
 
   const [items, setItems] = useState([
-    { id: 1, title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [] as File[], imageUrls: [] as string[], uploadProgress: 0 }
+    { id: 1, title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [] as File[], imageUrls: [] as string[], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }
   ]);
 
   // Address autocomplete state
@@ -50,7 +50,7 @@ export default function CreateAdPage() {
   // We will use the Autocomplete component from @react-google-maps/api instead of manual useEffect
 
   const addItem = () => {
-    setItems([...items, { id: Date.now(), title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [], imageUrls: [], uploadProgress: 0 }]);
+    setItems([...items, { id: Date.now(), title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [], imageUrls: [], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }]);
   };
 
   const removeItem = (id: number) => {
@@ -112,8 +112,16 @@ export default function CreateAdPage() {
       return;
     }
     for (const item of items) {
-      if (!item.title || !item.price || !item.condition) {
-        setError("נא למלא את כל שדות החובה עבור כל הפריטים (כותרת, מחיר ומצב).");
+      if (!item.title || !item.condition) {
+        setError("נא למלא את שדות החובה: כותרת ומצב פריט.");
+        return;
+      }
+      if ((item.dealType === "sale" || item.dealType === "wanted") && !item.price) {
+        setError("נא להזין מחיר/תקציב עבור פריטים למכירה או חיפוש.");
+        return;
+      }
+      if (item.dealType === "exchange" && !item.exchangeFor) {
+        setError("נא לציין מה תרצה לקבל בתמורה להחלפה.");
         return;
       }
     }
@@ -134,8 +142,11 @@ export default function CreateAdPage() {
         const docRef = await addDoc(adsRef, {
           title: item.title,
           type: item.type,
-          price: Number(item.price),
-          isNegotiable: item.isNegotiable,
+          dealType: item.dealType || "sale",
+          price: Number(item.price) || 0,
+          isNegotiable: item.dealType === "sale" ? item.isNegotiable : false,
+          exchangeFor: item.dealType === "exchange" ? item.exchangeFor : null,
+          exchangeCashRole: item.dealType === "exchange" ? item.exchangeCashRole : null,
           genre: item.genre,
           condition: item.condition,
           locationName: location,
@@ -294,6 +305,21 @@ export default function CreateAdPage() {
               </div>
 
               <div className={styles.itemGrid}>
+                <div className={styles.formGroup} style={{ gridColumn: "1 / -1", display: "flex", gap: "24px", alignItems: "center", marginBottom: "8px" }}>
+                  <label style={{ margin: 0, fontWeight: 700 }}>סוג מודעה:</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", cursor: "pointer" }}>
+                    <input type="radio" name={`dealType-${item.id}`} value="sale" checked={item.dealType === "sale"} onChange={() => updateItem(item.id, "dealType", "sale")} />
+                    מכירה 💰
+                  </label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", cursor: "pointer" }}>
+                    <input type="radio" name={`dealType-${item.id}`} value="exchange" checked={item.dealType === "exchange"} onChange={() => updateItem(item.id, "dealType", "exchange")} />
+                    החלפה 🤝
+                  </label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", cursor: "pointer" }}>
+                    <input type="radio" name={`dealType-${item.id}`} value="wanted" checked={item.dealType === "wanted"} onChange={() => updateItem(item.id, "dealType", "wanted")} />
+                    חיפוש 🔎
+                  </label>
+                </div>
                 <div className={styles.formGroup}>
                   <label>סוג פריט</label>
                   <select value={item.type} onChange={(e) => updateItem(item.id, "type", e.target.value)}>
@@ -305,15 +331,38 @@ export default function CreateAdPage() {
                   </select>
                 </div>
                 <div className={styles.formGroup}>
-                  <label>כותרת / שם הפריט</label>
-                  <input type="text" placeholder="למשל: תקליט Abbey Road מקורי" value={item.title} onChange={(e) => updateItem(item.id, "title", e.target.value)} />
+                  <label>{item.dealType === "wanted" ? "מה אתה מחפש?" : "כותרת / שם הפריט"}</label>
+                  <input type="text" placeholder={item.dealType === "wanted" ? "למשל: תקליט מקורי של הביטלס" : "למשל: תקליט Abbey Road מקורי"} value={item.title} onChange={(e) => updateItem(item.id, "title", e.target.value)} />
                 </div>
+                {item.dealType === "sale" || item.dealType === "wanted" ? (
+                  <div className={styles.formGroup}>
+                    <label>{item.dealType === "wanted" ? "תקציב מקסימלי (₪)" : "מחיר (₪)"}</label>
+                    <input type="number" placeholder="0" value={item.price} onChange={(e) => updateItem(item.id, "price", e.target.value)} />
+                  </div>
+                ) : (
+                  <>
+                    <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
+                      <label>מה תרצה לקבל בתמורה?</label>
+                      <input type="text" placeholder="למשל: תקליטים של פינק פלויד, פטיפון טכניקס..." value={item.exchangeFor} onChange={(e) => updateItem(item.id, "exchangeFor", e.target.value)} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>תוספת תשלום?</label>
+                      <select value={item.exchangeCashRole} onChange={(e) => updateItem(item.id, "exchangeCashRole", e.target.value)}>
+                        <option value="none">ללא תוספת (החלפה ראש בראש)</option>
+                        <option value="receive">אני מעוניין לקבל תוספת כסף</option>
+                        <option value="add">אני מוכן להוסיף כסף</option>
+                      </select>
+                    </div>
+                    {item.exchangeCashRole !== "none" && (
+                      <div className={styles.formGroup}>
+                        <label>סכום תוספת (₪)</label>
+                        <input type="number" placeholder="0" value={item.price} onChange={(e) => updateItem(item.id, "price", e.target.value)} />
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className={styles.formGroup}>
-                  <label>מחיר (₪)</label>
-                  <input type="number" placeholder="0" value={item.price} onChange={(e) => updateItem(item.id, "price", e.target.value)} />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>מצב</label>
+                  <label>{item.dealType === "wanted" ? "מצב מבוקש" : "מצב"}</label>
                   <select value={item.condition} onChange={(e) => updateItem(item.id, "condition", e.target.value)}>
                     <option value="">בחר מצב...</option>
                     <option value="חדש באריזה">חדש באריזה</option>
@@ -331,12 +380,14 @@ export default function CreateAdPage() {
                 )}
               </div>
 
-              <div className={styles.checkboxGroup}>
-                <label className={styles.checkboxLabel}>
-                  <input type="checkbox" checked={item.isNegotiable} onChange={(e) => updateItem(item.id, "isNegotiable", e.target.checked)} />
-                  <span>גמיש במחיר</span>
-                </label>
-              </div>
+              {(item.dealType === "sale" || item.dealType === "wanted") && (
+                <div className={styles.checkboxGroup}>
+                  <label className={styles.checkboxLabel}>
+                    <input type="checkbox" checked={item.isNegotiable} onChange={(e) => updateItem(item.id, "isNegotiable", e.target.checked)} />
+                    <span>{item.dealType === "wanted" ? "גמיש בתקציב" : "גמיש במחיר"}</span>
+                  </label>
+                </div>
+              )}
 
               {/* Image upload */}
               <div className={styles.imageUpload}>

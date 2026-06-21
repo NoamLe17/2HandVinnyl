@@ -21,6 +21,7 @@ export default function StorePage() {
   const [distance, setDistance] = useState(50);
   const [category, setCategory] = useState("all");
   const [condition, setCondition] = useState("all");
+  const [dealTypeFilter, setDealTypeFilter] = useState("all");
   
   useEffect(() => {
     const fetchAds = async () => {
@@ -65,6 +66,11 @@ export default function StorePage() {
       updated = updated.filter(ad => ad.condition === condition);
     }
 
+    // Filter by Deal Type
+    if (dealTypeFilter !== "all") {
+      updated = updated.filter(ad => ad.dealType === dealTypeFilter || (!ad.dealType && dealTypeFilter === "sale"));
+    }
+
     // Filter by Distance
     if (userLocation) {
       updated = updated.map(ad => {
@@ -77,7 +83,7 @@ export default function StorePage() {
     }
 
     setFilteredAds(updated);
-  }, [distance, category, condition, ads, userLocation]);
+  }, [distance, category, condition, dealTypeFilter, ads, userLocation]);
 
   return (
     <div className={`container ${styles.container}`}>
@@ -134,6 +140,16 @@ export default function StorePage() {
           </div>
 
           <div className={styles.filterGroup}>
+            <label>סוג עסקה</label>
+            <select value={dealTypeFilter} onChange={(e) => setDealTypeFilter(e.target.value)}>
+              <option value="all">הכל</option>
+              <option value="sale">למכירה</option>
+              <option value="exchange">להחלפה</option>
+              <option value="wanted">מחפש קנייה</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
             <label>מצב פריט</label>
             <select value={condition} onChange={(e) => setCondition(e.target.value)}>
               <option value="all">כל המצבים</option>
@@ -167,7 +183,7 @@ export default function StorePage() {
         ) : filteredAds.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }} className="glass-panel">
             <p style={{ fontSize: '1.2rem', marginBottom: '16px' }}>לא נמצאו מודעות המתאימות לסינון.</p>
-            <button className="btn-secondary" onClick={() => { setDistance(100); setCategory("all"); setCondition("all"); }}>
+            <button className="btn-secondary" onClick={() => { setDistance(100); setCategory("all"); setCondition("all"); setDealTypeFilter("all"); }}>
               נקה סינונים
             </button>
           </div>
@@ -190,7 +206,13 @@ export default function StorePage() {
                   </span>
                 </div>
                 <div className={styles.cardFooter}>
-                  <span className={styles.price}>₪{item.price}</span>
+                  {item.dealType === "wanted" ? (
+                    <span className={styles.price} style={{ color: "#F72585" }}>🔎 תקציב: ₪{item.price}</span>
+                  ) : item.dealType === "exchange" ? (
+                    <span className={styles.price} style={{ color: "#4CC9F0" }}>🤝 להחלפה</span>
+                  ) : (
+                    <span className={styles.price}>₪{item.price}</span>
+                  )}
                   <Link href={`/store/${item.id}`} className="btn-secondary">פרטים</Link>
                 </div>
               </div>

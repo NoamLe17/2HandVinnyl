@@ -5,9 +5,8 @@ import { GoogleMap, useLoadScript, Marker, Circle, InfoWindow, Libraries } from 
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import { addDoc, serverTimestamp } from "firebase/firestore";
-import Link from "next/link";
 import styles from "@/app/map/map.module.css";
-import { Navigation, RefreshCw } from "lucide-react";
+import { RefreshCw, Crosshair } from "lucide-react";
 
 const containerStyle = { width: "100%", height: "100%", minHeight: "400px", borderRadius: "12px" };
 const defaultCenter = { lat: 31.7683, lng: 35.2137 }; // Jerusalem center
@@ -59,20 +58,26 @@ export default function MapComponent() {
   const [searchingStores, setSearchingStores] = useState(false);
   const [mapMoved, setMapMoved] = useState(false); // show "search this area" button
 
-  useEffect(() => {
+  const handleLocateMe = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
           const loc = { lat: coords.latitude, lng: coords.longitude };
           setUserLocation(loc);
           setCenter(loc);
-          setZoom(13);
+          setZoom(14);
         },
-        () => console.warn("Geolocation denied"),
+        () => alert("לא ניתן היה למצוא את המיקום שלך. ודא ששירותי המיקום של המכשיר פעילים והענקת הרשאה לדפדפן."),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
+    } else {
+      alert("הדפדפן שלך אינו תומך בשירותי מיקום.");
     }
   }, []);
+
+  useEffect(() => {
+    handleLocateMe();
+  }, [handleLocateMe]);
 
   const searchStoresInViewport = useCallback(() => {
     if (!mapRef.current) return;
@@ -150,8 +155,17 @@ export default function MapComponent() {
   };
 
   const mapOptions = useMemo(() => ({
-    disableDefaultUI: false,
+    disableDefaultUI: true,
+    zoomControl: true,
+    streetViewControl: false,
+    mapTypeControl: false,
+    fullscreenControl: false,
     clickableIcons: false,
+    gestureHandling: "greedy",
+    styles: [
+      { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] }
+    ]
   }), []);
 
   if (!isLoaded) {
@@ -196,6 +210,9 @@ export default function MapComponent() {
         {/* Ad markers – real-time */}
         {ads.map(ad => {
           if (!ad.lat || !ad.lng) return null;
+          const isExchange = ad.dealType === "exchange";
+          const isWanted = ad.dealType === "wanted";
+          const fillColor = isWanted ? "#F72585" : isExchange ? "#4CC9F0" : "#7b2cbf";
           return (
             <Marker
               key={ad.id}
@@ -203,7 +220,7 @@ export default function MapComponent() {
               icon={{
                 path: google.maps.SymbolPath.CIRCLE,
                 scale: 10,
-                fillColor: "#7b2cbf",
+                fillColor: fillColor,
                 fillOpacity: 0.9,
                 strokeColor: "white",
                 strokeWeight: 2,
@@ -238,11 +255,27 @@ export default function MapComponent() {
             options={{ pixelOffset: new google.maps.Size(0, -14) }}
           >
             <div style={{ direction: "rtl", padding: "4px", minWidth: "220px", fontFamily: "inherit" }}>
-              <div style={{ marginBottom: "8px" }}>
-                <span style={{ background: "#7b2cbf", color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "0.8rem" }}>{selectedAd.type}</span>
+              <div style={{ marginBottom: "8px", display: "flex", gap: "6px" }}>
+                <span style={{ background: selectedAd.dealType === "wanted" ? "#F72585" : selectedAd.dealType === "exchange" ? "#4CC9F0" : "#7b2cbf", color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "0.8rem" }}>
+                  {selectedAd.dealType === "wanted" ? "חיפוש" : selectedAd.dealType === "exchange" ? "החלפה" : selectedAd.type}
+                </span>
               </div>
               <h3 style={{ margin: "0 0 4px", fontSize: "1.1rem", fontWeight: 700 }}>{selectedAd.title}</h3>
-              <p style={{ margin: "0 0 4px", color: "#7b2cbf", fontWeight: 700 }}>₪{selectedAd.price}</p>
+              
+              {selectedAd.dealType === "wanted" ? (
+                <div style={{ marginBottom: "8px" }}>
+                  <p style={{ margin: "0 0 4px", color: "#F72585", fontWeight: 700, fontSize: "0.95rem" }}>תקציב: ₪{selectedAd.price}</p>
+                </div>
+              ) : selectedAd.dealType === "exchange" ? (
+                <div style={{ marginBottom: "8px" }}>
+                  <p style={{ margin: "0 0 4px", color: "#0096c7", fontWeight: 700, fontSize: "0.95rem" }}>תמורת: {selectedAd.exchangeFor}</p>
+                  {selectedAd.exchangeCashRole === "receive" && <p style={{ margin: "0 0 4px", fontSize: "0.85rem", color: "#666" }}>דורש תוספת: ₪{selectedAd.price}</p>}
+                  {selectedAd.exchangeCashRole === "add" && <p style={{ margin: "0 0 4px", fontSize: "0.85rem", color: "#666" }}>מוסיף: ₪{selectedAd.price}</p>}
+                </div>
+              ) : (
+                <p style={{ margin: "0 0 4px", color: "#7b2cbf", fontWeight: 700 }}>₪{selectedAd.price}</p>
+              )}
+              
               <p style={{ margin: "0 0 12px", color: "#666", fontSize: "0.85rem" }}>{selectedAd.locationName}</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <a href={`/store/${selectedAd.id}`} style={{ display: "block", textAlign: "center", background: "#7b2cbf", color: "white", padding: "8px 12px", borderRadius: "8px", textDecoration: "none", fontWeight: 600 }}>
@@ -285,6 +318,10 @@ export default function MapComponent() {
 
       {/* Floating controls */}
       <div className={`glass-panel ${styles.mapControls}`}>
+        <button onClick={handleLocateMe} className={styles.locateBtn} title="המיקום שלי">
+          <Crosshair size={20} />
+        </button>
+        <div style={{ width: "1px", height: "24px", background: "var(--border)" }}></div>
         <label className={styles.checkboxLabel}>
           <input type="checkbox" checked={showStores} onChange={e => handleToggleStores(e.target.checked)} />
           {searchingStores ? "מחפש חנויות..." : `הצג חנויות תקליטים 🏪${storeMarkers.length > 0 ? ` (${storeMarkers.length})` : ""}`}

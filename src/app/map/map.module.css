@@ -30,16 +30,55 @@
 .mapControls {
   position: absolute;
   bottom: 24px;
-  right: 24px;
+  right: 50%;
+  transform: translateX(50%); /* Center horizontally */
   z-index: 10;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   display: flex;
   align-items: center;
   gap: 12px;
   border-radius: 100px;
+  width: max-content;
+  max-width: 90vw;
+}
+
+.locateBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.locateBtn:hover {
+  color: var(--primary);
+  background: var(--background);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
 }
 
 .filterTitle {
@@ -127,8 +166,22 @@
 }
 
 @media (max-width: 900px) {
+  .container {
+    top: 64px; /* Adjust if mobile header is shorter */
+  }
+
   .topBar {
-    padding: 12px;
+    padding: 12px 16px;
+  }
+
+  .mapControls {
+    bottom: 16px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .checkboxLabel {
+    font-size: 0.85rem;
   }
 
   .mobileToggle {
