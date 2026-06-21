@@ -46,5 +46,20 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isMaster();
     }
+
+    // Chats
+    match /chats/{chatId} {
+      allow read: if isMaster() || (request.auth != null && request.auth.uid in resource.data.participants);
+      // For create, allow if user is in the participants array being written
+      allow create: if request.auth != null && request.auth.uid in request.resource.data.participants;
+      allow update: if request.auth != null && request.auth.uid in resource.data.participants;
+      
+      match /messages/{msgId} {
+        allow read: if isMaster() || (request.auth != null && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants);
+        allow create: if request.auth != null 
+                     && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+                     && request.resource.data.senderId == request.auth.uid;
+      }
+    }
   }
 }

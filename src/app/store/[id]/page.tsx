@@ -5,8 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "./details.module.css";
 import { Disc, MapPin, ShieldCheck, Heart, Share2, MessageCircle, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/firebase";
-import { doc, getDoc, addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { doc, getDoc, addDoc, collection, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 
 export default function AdDetailsPage() {
   const params = useParams();
@@ -15,6 +16,12 @@ export default function AdDetailsPage() {
   const [adDetails, setAdDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setUser(u));
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const fetchAndTrack = async () => {
@@ -83,6 +90,56 @@ export default function AdDetailsPage() {
 
   const prevImage = () => {
     setCurrentImageIdx((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleStartChat = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.uid === adDetails.sellerId) {
+      alert("זוהי המודעה שלך.");
+      return;
+    }
+    
+    // Check if chat already exists for this ad and these two users
+    const q = query(collection(db, "chats"), 
+      where("adId", "==", adDetails.id),
+      where("participants", "array-contains", user.uid)
+    );
+    const snapshot = await getDocs(q);
+    
+    let existingChatId = null;
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.participants.includes(adDetails.sellerId)) {
+        existingChatId = doc.id;
+      }
+    });
+
+    if (existingChatId) {
+      router.push(`/messages?chatId=${existingChatId}`);
+    } else {
+      // Create new chat
+      const chatData = {
+        participants: [user.uid, adDetails.sellerId],
+        participantNames: {
+          [user.uid]: user.displayName || user.email?.split("@")[0] || "משתמש",
+          [adDetails.sellerId]: adDetails.sellerName || "מוכר"
+        },
+        adId: adDetails.id,
+        adTitle: adDetails.title,
+        adImage: adDetails.images?.[0] || "",
+        lastMessage: "",
+        updatedAt: serverTimestamp(),
+        unreadCount: {
+          [user.uid]: 0,
+          [adDetails.sellerId]: 0
+        }
+      };
+      const docRef = await addDoc(collection(db, "chats"), chatData);
+      router.push(`/messages?chatId=${docRef.id}`);
+    }
   };
 
   return (
@@ -222,9 +279,9 @@ export default function AdDetailsPage() {
             </Link>
 
             <div className={styles.actions}>
-              <Link href="/messages" className={`btn-primary ${styles.actionBtn}`}>
+              <button onClick={handleStartChat} className={`btn-primary ${styles.actionBtn}`}>
                 <MessageCircle size={20} /> {adDetails.dealType === "wanted" ? "יש לי את הפריט! שלח הודעה" : "שלח הודעה למוכר"}
-              </Link>
+              </button>
               <div className={styles.secondaryActions}>
                 <button className={`btn-secondary ${styles.iconBtn}`}><Heart size={20} /></button>
                 <button className={`btn-secondary ${styles.iconBtn}`}><Share2 size={20} /></button>
