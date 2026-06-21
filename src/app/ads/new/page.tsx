@@ -24,7 +24,7 @@ export default function CreateAdPage() {
   });
 
   const [items, setItems] = useState([
-    { id: 1, title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [] as File[], imageUrls: [] as string[], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }
+    { id: 1, title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", description: "", images: [] as File[], imageUrls: [] as string[], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }
   ]);
 
   // Address autocomplete state
@@ -50,7 +50,7 @@ export default function CreateAdPage() {
   // We will use the Autocomplete component from @react-google-maps/api instead of manual useEffect
 
   const addItem = () => {
-    setItems([...items, { id: Date.now(), title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", images: [], imageUrls: [], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }]);
+    setItems([...items, { id: Date.now(), title: "", type: "תקליט", price: "", isNegotiable: false, genre: "", condition: "", description: "", images: [], imageUrls: [], uploadProgress: 0, dealType: "sale", exchangeFor: "", exchangeCashRole: "none" }]);
   };
 
   const removeItem = (id: number) => {
@@ -58,7 +58,7 @@ export default function CreateAdPage() {
   };
 
   const updateItem = (id: number, field: string, value: any) => {
-    setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+    setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, [field]: value } : item));
   };
 
   const handleImageSelect = (itemId: number, files: FileList | null) => {
@@ -149,6 +149,7 @@ export default function CreateAdPage() {
           exchangeCashRole: item.dealType === "exchange" ? item.exchangeCashRole : null,
           genre: item.genre,
           condition: item.condition,
+          description: item.description || "",
           locationName: location,
           lat: locationCoords.lat,
           lng: locationCoords.lng,
@@ -378,6 +379,17 @@ export default function CreateAdPage() {
                     <input type="text" placeholder="למשל: רוק קלאסי, ג'אז" value={item.genre} onChange={(e) => updateItem(item.id, "genre", e.target.value)} />
                   </div>
                 )}
+                
+                <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
+                  <label>הערות / תיאור הפריט</label>
+                  <textarea 
+                    placeholder="פרטים נוספים שיעזרו (למשל: שריטות קטנות על העטיפה, מהדורה מוגבלת, סיבת ההחלפה...)" 
+                    value={item.description} 
+                    onChange={(e) => updateItem(item.id, "description", e.target.value)}
+                    rows={4}
+                    style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid var(--border)", background: "rgba(0,0,0,0.2)", color: "white", fontFamily: "inherit" }}
+                  />
+                </div>
               </div>
 
               {(item.dealType === "sale" || item.dealType === "wanted") && (

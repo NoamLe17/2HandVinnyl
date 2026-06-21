@@ -172,7 +172,7 @@
 
 @media (max-width: 900px) {
   .formLayout {
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
   
   .summaryPanel {

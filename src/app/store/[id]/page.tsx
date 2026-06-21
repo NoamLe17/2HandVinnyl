@@ -201,7 +201,7 @@ export default function AdDetailsPage() {
 
             <div className={styles.description}>
               <h3>תיאור הפריט</h3>
-              <p>{adDetails.description || "לא סופק תיאור על ידי המוכר."}</p>
+              <p style={{ whiteSpace: "pre-wrap" }}>{adDetails.description || "לא סופק תיאור על ידי המוכר."}</p>
             </div>
           </div>
         </div>
